@@ -1,0 +1,113 @@
+PostgreSQL
+
+# Connect locally
+psql -U postgres
+
+# Connect to specific database locally
+psql -U postgres -d urlshortener
+
+# View table rows locally
+psql -U postgres -d urlshortener -c "SELECT * FROM urls;"
+
+# Connect inside Docker
+docker exec -it urlshortner-postgres-1 psql -U postgres -d urlshortener
+
+# View table rows inside Docker
+docker exec -it urlshortner-postgres-1 psql -U postgres -d urlshortener -c "SELECT * FROM urls;"
+docker exec -it urlshortner-postgres-1 psql -U postgres -d urlshortener -c "SELECT * FROM clicks;"
+
+
+
+SQL Commands (inside psql shell)
+
+\dt            -- list all tables
+\d urls        -- describe urls table structure
+\q             -- quit psql shell
+
+SELECT * FROM urls;
+SELECT * FROM clicks;
+SELECT * FROM users;
+
+
+
+API Endpoints
+
+# Shorten a URL
+curl -X POST http://localhost:3000/shorten \
+  -H "Content-Type: application/json" \
+  -d '{"long_url": "https://www.youtube.com"}'
+
+# Redirect (follow the redirect)
+curl -L http://localhost:3000/{slug}
+curl -L http://localhost:3000/IzjCKhDL
+
+# View stats for a slug
+curl http://localhost:3000/stats/IzjCKhDL
+
+# Health check
+curl http://localhost:3000/health
+
+
+
+Docker
+
+# Check versions
+docker --version
+docker compose version
+
+# Build and start all services
+docker compose up --build
+
+# Start without rebuilding
+docker compose up
+
+# Run in background (detached)
+docker compose up --build -d
+
+# Stop all services
+docker compose down
+
+# Stop and wipe database volume
+docker compose down -v
+
+# View running containers
+docker ps
+
+# View logs of a specific service
+docker logs urlshortner-app-1
+docker logs urlshortner-postgres-1
+docker logs urlshortner-redis-1
+
+
+
+Redis
+
+# Check if running
+redis-cli ping                        # PONG = running
+
+# Get a cached slug
+redis-cli get slug:IzjCKhDL
+
+# View rate limit data for an IP
+redis-cli zrange rl:127.0.0.1 0 -1 withscores
+
+# Flush all Redis data (careful!)
+redis-cli flushall
+
+# Start / Stop Redis locally (Mac)
+brew services start redis
+brew services stop redis
+
+
+
+
+Local PostgreSQL (Mac)
+
+# Start
+brew services start postgresql@14
+
+# Stop
+brew services stop postgresql@14
+
+# Check status
+brew services list
